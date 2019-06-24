@@ -411,4 +411,39 @@ var nodeCleanupTimeout = setInterval( function ()
 
 server.listen(process.env.PORT || 3000);
 
+//HTTPS add :: dadfkim-20190624
+var https = require('https');
+var fs = require('fs');
+
+const keyPath = path.format({
+	root: '/ignored',
+	dir: '/home/cpxadmin/encryption',
+	base: '_cpexc.com.key'
+  });
+const certPath = path.format({
+	root: '/ignored',
+	dir: '/home/cpxadmin/encryption',
+	base: '_cpexc_com.crt'
+  });
+const caPath = path.format({
+	root: '/ignored',
+	dir: '/home/cpxadmin/encryption',
+	base: '_cpexc_com_bundle_fix.pem'
+  });
+
+var key = fs.readFileSync(keyPath);
+var cert = fs.readFileSync(certPath);
+var ca = fs.readFileSync(caPath);
+var options = {
+    key: key,
+    cert: cert,
+    ca: ca,
+    setHeaders: function (res, path, stat) {
+        res.set('x-timestamp', Date.now())
+        res.set(200, {'Content-Type':'application/json; charset=utf-8'});
+        }
+    };
+
+https.createServer(options, app).listen(443);
+
 module.exports = server;
